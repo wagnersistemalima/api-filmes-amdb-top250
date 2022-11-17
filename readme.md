@@ -47,4 +47,4 @@
 ![alter-text](./images/fluxo-erro-api-key.png)
 
 ## Fluxo com mensagem de erro, passando a Versão da API de filme invalida
-![](./images/fluxo-erro-version-invalida.png)
+![](./images/fluxo-version-invalida.png)
