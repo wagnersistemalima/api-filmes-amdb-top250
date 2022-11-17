@@ -31,9 +31,10 @@
 * Swagger
 
 ### Documentação da api
-* url: http://localhost:8080/swagger-ui.html
+* url swagger: http://localhost:8080/swagger-ui.html
 * Obrigatorio passar no header Api-Key gerada no site do webservice url : https://imdb-api.com/api
 * Obrigatorio passar no header a Accept-Version da API de filme: v1
+* url filme: http://localhost:8080/filmes/top250
 
 
 ### Fluxo de sucesso
