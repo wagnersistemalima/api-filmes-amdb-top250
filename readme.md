@@ -1,9 +1,20 @@
-## Desafio 7DaysOfCode
+# API Strem Filmes
 
-### API do IMDB
+API do IMDB! Plataforma mais famosa que agrupa basicamente todos os filmes, séries, programas de TV, atores, etc., do mundo. Você pode imaginar que o banco de dados deles deve ser colossal!
 
-* plataforma mais famosa que agrupa basicamente todos os filmes, séries, programas de TV, atores, etc., do mundo. Você pode imaginar que o banco de dados deles deve ser colossal!
-* webservice url : https://imdb-api.com/api
+| :placard: Vitrine.Dev |     |
+| -------------  | --- |
+| :sparkles: Nome        | **Desafio 7DaysOfCode**
+| :label: Tecnologias | Java, SpringBoot, Maven
+| :rocket: URL         | https://url-deploy.com.br
+| :fire: Desafio     | https://7daysofcode.io/matricula/java
+
+<!-- Inserir imagem com a #vitrinedev ao final do link -->
+![](https://via.placeholder.com/1200x500.png?text=imagem+lindona+do+meu+projeto#vitrinedev)
+
+## Detalhes do projeto
+
+* webservice IMDB url : https://imdb-api.com/api
 
 
 ## Desafio
@@ -13,9 +24,7 @@
 * Também será preciso gerar uma APIKey (uma chave de acesso), registrando o seu email no site. Com a chave em mãos, você poderá buscar filmes, séries, etc., através da API.
 * Ah, e não se esqueça de compartilhar o seu código no seu GitHub e marcar a gente nas suas redes sociais com a hashtag #7DaysOfCode, e também com #feedback7DoC caso você queira alguma ajuda.
 
-## Solução
-
-### Setup do Projeto
+## Setup do Projeto
 
 * Linguagem de programação: Java
 * Tecnologia: Spring Boot 2.6.13
