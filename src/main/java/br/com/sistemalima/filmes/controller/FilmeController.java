@@ -1,5 +1,6 @@
 package br.com.sistemalima.filmes.controller;
 
+import br.com.sistemalima.filmes.dto.FilmeDTO;
 import br.com.sistemalima.filmes.http.imdb.dto.Top250Data;
 import br.com.sistemalima.filmes.mapper.ObservabilidadeMapper;
 import br.com.sistemalima.filmes.model.Observabilidade;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,7 +35,7 @@ public class FilmeController {
     private final static String tagEnd = "Fim do processo, class: FilmeController, ";
 
     @GetMapping("/top250")
-    public ResponseEntity<Top250Data> listar(
+    public ResponseEntity<List<FilmeDTO>> listar(
             @RequestHeader("Accept-Version") @NotEmpty(message = "informe o cabeçalho") String version,
             @RequestHeader("Api-Key") @NotEmpty(message = "informe o cabeçalho") String apiKey
     ) throws IOException {
@@ -44,14 +46,10 @@ public class FilmeController {
 
         logger.info(String.format(tagStart + observabilidade));
 
-        Top250Data response = filmeService.listarFilmesTop250(apiKey, observabilidade);
+        List<FilmeDTO> listFilmeDTO = filmeService.listarFilmesTop250(apiKey, observabilidade);
 
         logger.info(String.format(tagEnd + observabilidade));
 
-        // imprimir o JSON correspondente no console da sua IDE
-
-        System.out.println(response);
-
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(listFilmeDTO);
     }
 }

@@ -1,10 +1,10 @@
 package br.com.sistemalima.filmes.controller;
 
-import br.com.sistemalima.filmes.builders.Top250DataDetailBuilder;
+import br.com.sistemalima.filmes.builders.Top250DataBuilder;
 import br.com.sistemalima.filmes.constant.ApiConstantVersion;
+import br.com.sistemalima.filmes.dto.FilmeDTO;
 import br.com.sistemalima.filmes.exceptions.BadRequestExceptions;
 import br.com.sistemalima.filmes.http.imdb.dto.Top250Data;
-import br.com.sistemalima.filmes.http.imdb.dto.Top250DataDetail;
 import br.com.sistemalima.filmes.mapper.ObservabilidadeMapper;
 import br.com.sistemalima.filmes.model.Observabilidade;
 import br.com.sistemalima.filmes.service.FilmeService;
@@ -22,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -47,20 +49,16 @@ class FilmeControllerTest {
             version, apiKey, resourceName, correlationId
     );
 
-
     @Test
     @DisplayName("deve retornar 200 ok com sucesso e a lista de filmes top250")
     public void deveRetornar200() throws Exception {
 
         // Dado
-        Top250Data top250Data = new Top250Data();
-        Top250DataDetail top250DataDetail1 = new Top250DataDetailBuilder().random();
-        Top250DataDetail top250DataDetail2 = new Top250DataDetailBuilder().random();
-        top250Data.getItems().add(top250DataDetail1);
-        top250Data.getItems().add(top250DataDetail2);
+        Top250Data top250Data = new Top250DataBuilder().random();
+        List<FilmeDTO> listFilmeDTO = top250Data.getItems().stream().map(FilmeDTO::new).toList();
 
         Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
-        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenReturn(top250Data);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenReturn(listFilmeDTO);
 
         // Quando / Então
 
@@ -69,7 +67,7 @@ class FilmeControllerTest {
                         .header("Api-Key", "apiKey")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andExpect(MockMvcResultMatchers.content().json(toJson(top250Data)));
+                .andExpect(MockMvcResultMatchers.content().json(toJson(listFilmeDTO)));
 
         Assertions.assertNull(top250Data.getErrorMessage());
 
@@ -92,16 +90,18 @@ class FilmeControllerTest {
     }
 
     @Test
-    @DisplayName("deve retornar 200 ok com sucesso e o objeto de resposta com message erro apiKey invalida ")
-    public void deveRetornar200ComObjetoMessageErroApiKeyInvalida() throws Exception {
+    @DisplayName("deve retornar 400 BadRequest quando nao validar api key")
+    public void deveRetornar400ApiKeyInvalida() throws Exception {
 
         // Dado
         Top250Data top250Data = new Top250Data();
         String messageErro = "apiKey invalida";
         top250Data.setErrorMessage(messageErro);
 
+        BadRequestExceptions exception = new BadRequestExceptions(messageErro);
+
         Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
-        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenReturn(top250Data);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenThrow(exception);
 
         // Quando / Então
 
@@ -109,16 +109,11 @@ class FilmeControllerTest {
                         .header("Accept-Version", "v1")
                         .header("Api-Key", "apiKeyInvalida")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andExpect(MockMvcResultMatchers.content().json(toJson(top250Data)));
-
-        Assertions.assertNotNull(top250Data.getErrorMessage());
-        Assertions.assertEquals(0, top250Data.getItems().size());
-
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
-    private String toJson(Top250Data top250Data) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(top250Data);
+    private String toJson(List<FilmeDTO> listFilmeDTO) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(listFilmeDTO);
     }
 
 }

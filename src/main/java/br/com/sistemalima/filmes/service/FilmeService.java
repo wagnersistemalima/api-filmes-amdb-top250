@@ -1,5 +1,7 @@
 package br.com.sistemalima.filmes.service;
 
+import br.com.sistemalima.filmes.dto.FilmeDTO;
+import br.com.sistemalima.filmes.exceptions.BadRequestExceptions;
 import br.com.sistemalima.filmes.http.imdb.ImdbFeingClient;
 import br.com.sistemalima.filmes.http.imdb.dto.Top250Data;
 import br.com.sistemalima.filmes.model.Observabilidade;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class FilmeService {
@@ -20,14 +23,21 @@ public class FilmeService {
     private final Logger logger = LoggerFactory.getLogger(FilmeService.class);
     private final static String tag = "class: FilmeService, ";
 
-    public Top250Data listarFilmesTop250(String apiKey, Observabilidade observabilidade) throws IOException {
+    public List<FilmeDTO> listarFilmesTop250(String apiKey, Observabilidade observabilidade) throws IOException {
 
         logger.info(String.format(tag + observabilidade));
 
         try {
-            return imdbFeingClient.buscar250TopFilmes(apiKey);
+            Top250Data top250Data = imdbFeingClient.buscar250TopFilmes(apiKey);
+            if (top250Data.getErrorMessage() == null || top250Data.getErrorMessage().equals("")) {
+                return top250Data.getItems().stream().map(FilmeDTO::new).toList();
+            }
+            logger.error(String.format("Error, " + tag + top250Data.getErrorMessage()));
+            throw new BadRequestExceptions(top250Data.getErrorMessage());
+
+
         } catch (FeignException ex) {
-            logger.info(String.format("Error, " + tag + ex.getMessage()));
+            logger.error(String.format("Error, " + tag + ex.getMessage()));
             throw new IOException(ex.getMessage());
         }
     }
