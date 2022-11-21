@@ -1,9 +1,10 @@
 package br.com.sistemalima.filmes.service;
 
-import br.com.sistemalima.filmes.builders.Top250DataDetailBuilder;
+import br.com.sistemalima.filmes.builders.Top250DataBuilder;
+import br.com.sistemalima.filmes.dto.FilmeDTO;
+import br.com.sistemalima.filmes.exceptions.BadRequestExceptions;
 import br.com.sistemalima.filmes.http.imdb.ImdbFeingClient;
 import br.com.sistemalima.filmes.http.imdb.dto.Top250Data;
-import br.com.sistemalima.filmes.http.imdb.dto.Top250DataDetail;
 import br.com.sistemalima.filmes.model.Observabilidade;
 import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -48,29 +50,21 @@ class FilmeServiceTest {
     public void deveListarFilmesTop250() throws IOException {
 
         // Dado
-        Top250DataDetail top250DataDetail1 = new Top250DataDetailBuilder().random();
-        Top250DataDetail top250DataDetail2 = new Top250DataDetailBuilder().random();
-        Top250DataDetail top250DataDetail3 = new Top250DataDetailBuilder().random();
-        Top250Data top250Data = new Top250Data();
-        top250Data.getItems().add(top250DataDetail1);
-        top250Data.getItems().add(top250DataDetail2);
-        top250Data.getItems().add(top250DataDetail3);
+
+        Top250Data top250Data = new Top250DataBuilder().random();
 
         Mockito.when(imdbFeingClient.buscar250TopFilmes(apiKey)).thenReturn(top250Data);
 
         // Quando / Então
-        Top250Data response = filmeService.listarFilmesTop250(apiKey, observabilidade);
-
-        assertNull(response.getErrorMessage());
-        assertEquals(3, response.getItems().size());
-
+        Assertions.assertDoesNotThrow( () -> filmeService.listarFilmesTop250(apiKey, observabilidade));
+        assertNull(top250Data.getErrorMessage());
         verify(imdbFeingClient, Mockito.times(1)).buscar250TopFilmes(apiKey);
 
     }
 
     @Test
-    @DisplayName("deve listar filmes top 250 retornando a lista de filmes vazia com erro message apiKey invalida")
-    public void deveListarFilmesTop250ErroMessage() throws IOException {
+    @DisplayName("deve lancar exception BadRquestException quando receber a message error do client apiKey invalida")
+    public void deveLancarBadRequestException() throws IOException {
 
         // Dado
         Top250Data top250Data = new Top250Data();
@@ -79,11 +73,12 @@ class FilmeServiceTest {
         Mockito.when(imdbFeingClient.buscar250TopFilmes(apiKey)).thenReturn(top250Data);
 
         // Quando / Então
+        Assertions.assertThrows(BadRequestExceptions.class, () ->
+                    filmeService.listarFilmesTop250(apiKey, observabilidade)
 
-        Top250Data response = filmeService.listarFilmesTop250(apiKey, observabilidade);
-
-        assertEquals(erroMesssage, response.getErrorMessage());
+        );
         verify(imdbFeingClient, Mockito.times(1)).buscar250TopFilmes(apiKey);
+        Assertions.assertNotNull(top250Data.getErrorMessage());
 
     }
 
@@ -100,5 +95,4 @@ class FilmeServiceTest {
         );
         verify(imdbFeingClient, Mockito.times(1)).buscar250TopFilmes(apiKey);
     }
-
 }

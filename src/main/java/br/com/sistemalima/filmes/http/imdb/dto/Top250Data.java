@@ -2,6 +2,7 @@ package br.com.sistemalima.filmes.http.imdb.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Top250Data {
 
@@ -34,5 +35,18 @@ public class Top250Data {
                 "items=" + items +
                 ", errorMessage='" + errorMessage + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Top250Data)) return false;
+        Top250Data that = (Top250Data) o;
+        return getErrorMessage().equals(that.getErrorMessage());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getErrorMessage());
     }
 }
