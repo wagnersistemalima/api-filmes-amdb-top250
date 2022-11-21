@@ -90,6 +90,7 @@ class FilmeServiceTest {
         Assertions.assertThrows(IOException.class, () ->
                 filmeService.listarFilmesTop250(observabilidade)
         );
+
         verify(imdbFeingClient, Mockito.times(1)).buscar250TopFilmes(Mockito.any());
     }
 }
