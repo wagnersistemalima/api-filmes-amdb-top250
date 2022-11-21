@@ -46,7 +46,7 @@ class FilmeControllerTest {
     private static final String resourceName = "resourceName";
     private static final String correlationId = "correlationId";
     private final Observabilidade observabilidade = new Observabilidade(
-            version, apiKey, resourceName, correlationId
+            version, resourceName, correlationId
     );
 
     @Test
@@ -57,8 +57,8 @@ class FilmeControllerTest {
         Top250Data top250Data = new Top250DataBuilder().random();
         List<FilmeDTO> listFilmeDTO = top250Data.getItems().stream().map(FilmeDTO::new).toList();
 
-        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
-        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenReturn(listFilmeDTO);
+        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any())).thenReturn(listFilmeDTO);
 
         // Quando / Então
 
@@ -78,7 +78,7 @@ class FilmeControllerTest {
     public void deveRetornar400() throws Exception {
 
         // Dado
-        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenThrow(new BadRequestExceptions("Cabeçalho da requisição version não validado!"));
+        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenThrow(new BadRequestExceptions("Cabeçalho da requisição version não validado!"));
 
         // Quando / Então
         mockMvc.perform(MockMvcRequestBuilders.get("/filmes/top250")
@@ -87,29 +87,6 @@ class FilmeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
 
-    }
-
-    @Test
-    @DisplayName("deve retornar 400 BadRequest quando nao validar api key")
-    public void deveRetornar400ApiKeyInvalida() throws Exception {
-
-        // Dado
-        Top250Data top250Data = new Top250Data();
-        String messageErro = "apiKey invalida";
-        top250Data.setErrorMessage(messageErro);
-
-        BadRequestExceptions exception = new BadRequestExceptions(messageErro);
-
-        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
-        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenThrow(exception);
-
-        // Quando / Então
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/filmes/top250")
-                        .header("Accept-Version", "v1")
-                        .header("Api-Key", "apiKeyInvalida")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     private String toJson(List<FilmeDTO> listFilmeDTO) throws JsonProcessingException {

@@ -1,0 +1,45 @@
+# documentação Swagger http://localhost:8080/swagger-ui.html
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+servers:
+  imdb-filmes:
+    url: https://imdb-api.com/en
+    apikey: ${API_KEY}
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: false
+      slidingWindowSize: 5
+      minimumNumberOfCalls: 4
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 50s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 100
+      recordExceptions:
+        - feign.FeignException
+        - java.io.IOException
+        - java.lang.Exception
+      ignoreExceptions:
+        - br.com.sistemalima.filmes.exceptions.BadRequestExceptions
+  instances:
+    listarTop250Filmes:
+      baseConfig: default
+    backendB:
+      baseConfig: default
+      minimumNumberOfCalls: 10
+resilience4j.retry:
+  configs:
+    default:
+      maxRetryAttempts: 2
+      waitDuration: 1000
+      retryExceptions:
+        - feign.FeignException
+        - java.io.IOException
+      ignoreExceptions:
+        - br.com.sistemalima.filmes.exceptions.BadRequestExceptions

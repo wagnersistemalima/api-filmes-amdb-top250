@@ -18,13 +18,13 @@ public class ObservabilidadeMapper {
     private final static String tag = "class: ObservabilidadeMapper, ";
     private final static String messageErrorVersion = "Cabeçalho da requisição version não validado!";
 
-    public Observabilidade map(String version, String apiKey, String resourceName, String correlationId) {
+    public Observabilidade map(String version, String resourceName, String correlationId) {
         logger.info(String.format(tag + "validando headers"));
 
-        return validaHeaders(version, apiKey, resourceName, correlationId);
+        return validaHeaders(version, resourceName, correlationId);
     }
 
-    private Observabilidade validaHeaders(String version, String requestId, String resourceName, String correlationId) {
+    private Observabilidade validaHeaders(String version, String resourceName, String correlationId) {
 
         ApiConstantVersion.initialization();
 
@@ -40,7 +40,6 @@ public class ObservabilidadeMapper {
 
         return new Observabilidade(
                 version,
-                requestId,
                 resourceName,
                 correlationId
 

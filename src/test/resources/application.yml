@@ -1,0 +1,9 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+servers:
+  imdb-filmes:
+    url: https://mock/en
+    apikey: apikey

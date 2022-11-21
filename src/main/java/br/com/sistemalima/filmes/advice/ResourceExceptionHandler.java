@@ -23,7 +23,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErroView handlerEntityException(Exception exception, HttpServletRequest request) {
-        logger.error(String.format(tag + "method: handlerEntityException, message: " + exception.getMessage()));
+        logger.error(String.format("Error, " + tag + "method: handlerEntityException, message: " + exception.getMessage()));
         return new ErroView(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -36,7 +36,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(IOException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ErroView handlerEntityException(IOException exception, HttpServletRequest request) {
-        logger.error(String.format(tag + "method: handlerEntityException, message: " + exception.getMessage()));
+        logger.error(String.format("Error, " + tag + "method: handlerEntityException, message: " + exception.getMessage()));
         return new ErroView(
                 LocalDateTime.now(),
                 HttpStatus.BAD_GATEWAY.value(),
@@ -49,7 +49,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(BadRequestExceptions.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErroView handlerBadRequestException(BadRequestExceptions exception, HttpServletRequest request) {
-        logger.error(String.format(tag + "method: handlerBadRequestException, message: " + exception.getMessage()));
+        logger.error(String.format("Error, " + tag + "method: handlerBadRequestException, message: " + exception.getMessage()));
         return new ErroView(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),

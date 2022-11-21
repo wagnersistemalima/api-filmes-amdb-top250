@@ -6,8 +6,6 @@ public class Observabilidade {
 
     private String version;
 
-    private String apiKey;
-
     private String resourceName;
 
     private LocalDateTime date = LocalDateTime.now();
@@ -17,9 +15,8 @@ public class Observabilidade {
     public Observabilidade() {
     }
 
-    public Observabilidade(String version, String apiKey, String resourceName, String correlationId) {
+    public Observabilidade(String version, String resourceName, String correlationId) {
         this.version = version;
-        this.apiKey = apiKey;
         this.resourceName = resourceName;
         this.correlationId = correlationId;
     }
@@ -30,14 +27,6 @@ public class Observabilidade {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
     }
 
     public String getResourceName() {
@@ -68,7 +57,6 @@ public class Observabilidade {
     public String toString() {
         return "Observabilidade{" +
                 "version='" + version + '\'' +
-                ", apiKey='" + apiKey + '\'' +
                 ", resourceName='" + resourceName + '\'' +
                 ", date=" + date +
                 ", correlationId='" + correlationId + '\'' +

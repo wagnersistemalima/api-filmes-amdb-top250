@@ -9,6 +9,7 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,15 +21,18 @@ public class FilmeService {
     @Autowired
     private ImdbFeingClient imdbFeingClient;
 
+    @Value("${servers.imdb-filmes.apikey}")
+    String apikey;
+
     private final Logger logger = LoggerFactory.getLogger(FilmeService.class);
     private final static String tag = "class: FilmeService, ";
 
-    public List<FilmeDTO> listarFilmesTop250(String apiKey, Observabilidade observabilidade) throws IOException {
+    public List<FilmeDTO> listarFilmesTop250(Observabilidade observabilidade) throws IOException {
 
         logger.info(String.format(tag + observabilidade));
 
         try {
-            Top250Data top250Data = imdbFeingClient.buscar250TopFilmes(apiKey);
+            Top250Data top250Data = imdbFeingClient.buscar250TopFilmes(apikey);
             if (top250Data.getErrorMessage() == null || top250Data.getErrorMessage().equals("")) {
                 return top250Data.getItems().stream().map(FilmeDTO::new).toList();
             }
