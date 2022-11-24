@@ -4,6 +4,7 @@ import br.com.sistemalima.filmes.builders.Top250DataBuilder;
 import br.com.sistemalima.filmes.constant.ApiConstantVersion;
 import br.com.sistemalima.filmes.dto.FilmeDTO;
 import br.com.sistemalima.filmes.exceptions.BadRequestExceptions;
+import br.com.sistemalima.filmes.exceptions.EntityNotFoundException;
 import br.com.sistemalima.filmes.http.imdb.dto.Top250Data;
 import br.com.sistemalima.filmes.mapper.ObservabilidadeMapper;
 import br.com.sistemalima.filmes.model.Observabilidade;
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.IOException;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -58,7 +60,7 @@ class FilmeControllerTest {
         List<FilmeDTO> listFilmeDTO = top250Data.getItems().stream().map(FilmeDTO::new).toList();
 
         Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
-        Mockito.when(filmeService.listarFilmesTop250(Mockito.any())).thenReturn(listFilmeDTO);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenReturn(listFilmeDTO);
 
         // Quando / Então
 
@@ -86,6 +88,60 @@ class FilmeControllerTest {
                         .header("Api-Key", "apiKey")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+
+    }
+
+    @Test
+    @DisplayName("deve retornar 404 EntityNotFoundException quando filtrar filme pelo title e ele não existir")
+    public void deveRetornar404() throws Exception {
+
+        // Dado
+
+        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenThrow(EntityNotFoundException.class);
+
+        // Quando / Então
+        mockMvc.perform(MockMvcRequestBuilders.get("/filmes/top250")
+                        .header("Accept-Version", "v2")
+                        .header("Api-Key", "apiKey")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(404));
+
+    }
+
+    @Test
+    @DisplayName("deve retornar 400 quando nao validar apiKey")
+    public void deveRetornar400ApiKeyInvalida() throws Exception {
+
+        // Dado
+
+        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenThrow(BadRequestExceptions.class);
+
+        // Quando / Então
+        mockMvc.perform(MockMvcRequestBuilders.get("/filmes/top250")
+                        .header("Accept-Version", "v2")
+                        .header("Api-Key", "apiKey")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(400));
+
+    }
+
+    @Test
+    @DisplayName("deve retornar 502 BadGateway quando api imdb nao estiver disponivel")
+    public void deveRetornar502ApiImdbIndisponivel() throws Exception {
+
+        // Dado
+
+        Mockito.when(observabilidadeMapper.map(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(observabilidade);
+        Mockito.when(filmeService.listarFilmesTop250(Mockito.any(), Mockito.any())).thenThrow(IOException.class);
+
+        // Quando / Então
+        mockMvc.perform(MockMvcRequestBuilders.get("/filmes/top250")
+                        .header("Accept-Version", "v2")
+                        .header("Api-Key", "apiKey")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(502));
 
     }
 

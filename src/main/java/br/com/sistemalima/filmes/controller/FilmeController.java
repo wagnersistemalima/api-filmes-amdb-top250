@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
@@ -39,7 +36,8 @@ public class FilmeController {
     @Cacheable(value = "listaTopFilme250")
     @CircuitBreaker(name = "listarTop250Filmes", fallbackMethod = "")
     public ResponseEntity<List<FilmeDTO>> listar(
-            @RequestHeader("Accept-Version") @NotEmpty(message = "informe o cabeçalho") String version
+            @RequestHeader("Accept-Version") @NotEmpty(message = "informe o cabeçalho") String version,
+            @RequestParam(value = "title", required = false) String title
     ) throws IOException {
 
         String correlationId = UUID.randomUUID().toString();
@@ -48,7 +46,7 @@ public class FilmeController {
 
         logger.info(String.format(tagStart + observabilidade));
 
-        List<FilmeDTO> listFilmeDTO = filmeService.listarFilmesTop250(observabilidade);
+        List<FilmeDTO> listFilmeDTO = filmeService.listarFilmesTop250(observabilidade, title);
 
         logger.info(String.format(tagEnd + observabilidade));
 
