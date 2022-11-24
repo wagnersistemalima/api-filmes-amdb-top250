@@ -41,7 +41,6 @@ public class FilmeController {
     ) throws IOException {
 
         String correlationId = UUID.randomUUID().toString();
-
         Observabilidade observabilidade = observabilidadeMapper.map(version, listarTop250Filmes, correlationId);
 
         logger.info(String.format(tagStart + observabilidade));
